@@ -34,6 +34,9 @@ DEBUG = env('DEBUG')
 # Raises django's ImproperlyConfigured exception if SECRET_KEY not in os.environ
 SECRET_KEY = env('SECRET_KEY')
 
+# 결제 API 정보
+KAKAO_ADMIN_KEY = env('KAKAKAO_ADMIN_KEY')
+
 ALLOWED_HOSTS = []
 
 
@@ -53,6 +56,7 @@ INSTALLED_APPS = [
     'djoser',
 
     'product',
+    'order',
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -124,9 +128,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ko-kr'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
