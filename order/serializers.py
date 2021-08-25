@@ -61,6 +61,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "address_label",
             "zipcode",
             "items",
+            "payment_status",
         )
     
     def create(self, validated_data):
@@ -70,18 +71,4 @@ class OrderSerializer(serializers.ModelSerializer):
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)
             
-        return order
-
-
-class PaymentAuthorizationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = (
-            "id",
-            "payment_unique_numbers",
-        )
-    
-    def create(self, validated_data):
-        order = Order.objects.create(**validated_data)
-        OrderItem.objects.create(order=order)
         return order

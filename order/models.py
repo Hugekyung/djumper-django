@@ -15,7 +15,7 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     paid_amount = models.DecimalField(max_digits=10, decimal_places=0, blank=True, null=True)
     payment_method = models.CharField(max_length=100, verbose_name='결제 수단(N페이, 카카오페이 등)', null=True)
-    payment_status = models.BooleanField(default=False, verbose_name='결제 완료 여부')
+    payment_status = models.CharField(max_length=10, default=False, verbose_name='결제 완료 여부')
     payment_unique_numbers = models.CharField(max_length=100, verbose_name='결제 고유번호', null=True)
 
     class Meta:

@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import Order
-from .serializers import MyOrderSerializer, OrderSerializer, PaymentAuthorizationSerializer
+from .serializers import MyOrderSerializer, OrderSerializer
 
 
 # 카카오페이 결제 API 연동 - 결제 준비 단계
@@ -52,7 +52,7 @@ def checkout(request):
             payment_unique_numbers = response['tid']
 
             serializer.save(user=request.user, paid_amount=total_amount, payment_method=payment_method, payment_unique_numbers=payment_unique_numbers)
-
+            
             return Response(response)
         except Exception:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -61,42 +61,51 @@ def checkout(request):
 
 
 # 카카오페이 결제 API 연동 - 결제 승인 단계
-@api_view(['POST'])
+@api_view(['PATCH'])
 @authentication_classes([authentication.TokenAuthentication,])
 @permission_classes([permissions.IsAuthenticated,])
 def confirm(request):
-    serializer = PaymentAuthorizationSerializer(data=request.data)
     tid_queryset = Order.objects.filter(user=request.user).values_list('payment_unique_numbers', flat=True).order_by('-created_at')
+    pk_queryset = Order.objects.filter(user=request.user).values_list('id', flat=True).order_by('-created_at')
+    pk = pk_queryset[0]
     tid = tid_queryset[0] # 가장 최근에 추가된 tid
-    pg_token = request.data['pg_token']
 
-    if serializer.is_valid():
-        url = "https://kapi.kakao.com"
-        headers = {
-            'Authorization': "KakaoAK " + settings.KAKAO_ADMIN_KEY,
-        }
-        params = {
-            'cid': "TC0ONETIME", # 가맹점 코드(테스트용)TC0ONETIME
-            'tid': tid, # 결제 고유번호
-            'partner_order_id': 'partner_order_id', # 가맹점 주문번호
-            'partner_user_id': 'partner_user_id', # 가맹점 회원 id
-            'pg_token': pg_token,
-        }
+    pg_token = request.data['pg_token'] # request.data의 유일한 데이터
+    # payment_status = True # 기존의 인스턴스에 업데이트 하려는 데이터
 
-        try:
-            response = requests.post(url+"/v1/payment/approve", params=params, headers=headers)
-            response = json.loads(response.text)
-            payment_status = True
+    # if serializer.is_valid():
+    url = "https://kapi.kakao.com"
+    headers = {
+        'Authorization': "KakaoAK " + settings.KAKAO_ADMIN_KEY,
+    }
+    params = {
+        'cid': "TC0ONETIME", # 가맹점 코드(테스트용)TC0ONETIME
+        'tid': tid, # 결제 고유번호
+        'partner_order_id': 'partner_order_id', # 가맹점 주문번호
+        'partner_user_id': 'partner_user_id', # 가맹점 회원 id
+        'pg_token': pg_token,
+    }
 
-            print(response)
+    try:
+        response = requests.post(url+"/v1/payment/approve", params=params, headers=headers)
+        response = json.loads(response.text)
 
-            serializer.save(user=request.user, payment_status=payment_status) # 결제 상세 내용 저장하는 model, serializer도 만들어 보기
+        print(response) # 결제 상세 내용 저장하는 model, serializer도 만들어 보기
 
-            return Response(response)
-        except Exception:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # PATCH 부분 이렇게 저장하는게 맞는지 잘 모르겠다..
+        # serializer를 거치지 않고 바로 모델에 접근해서 저장하는게 맞는건지?
+        # 오류난 부분 없이 데이터를 정확하게 db에 insert했다는 점에서는 문제가 없다고 봐야하나..
+        data = request.data
+        order = Order.objects.get(id=pk)
 
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        order.payment_status = data.get('payment_status', order.payment_status) # 결제 여부만 부분 update
+        order.save()
+        
+        return Response(response)
+    except Exception:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OrdersList(APIView):
