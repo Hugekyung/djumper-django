@@ -16,6 +16,7 @@ from .models import Order
 from .serializers import MyOrderSerializer, OrderSerializer
 
 
+# 네이버페이를 추가할 경우 --> CBV로 리팩토링 해야할 듯..?
 # 카카오페이 결제 API 연동 - 결제 준비 단계
 @api_view(['POST'])
 @authentication_classes([authentication.TokenAuthentication,])
@@ -65,6 +66,8 @@ def checkout(request):
 @authentication_classes([authentication.TokenAuthentication,])
 @permission_classes([permissions.IsAuthenticated,])
 def confirm(request):
+    # ORM을 통해 객체를 가져올 경우 [(1), (2), ..., ]의 형태로 개별 객체가 튜플에 담기는 형태이지만,
+    # flat=True 옵션을 주게 되면 [1, 2, ..., ]의 형태로 하나의 리스트에 쭉 늘어놓게 된다.
     tid_queryset = Order.objects.filter(user=request.user).values_list('payment_unique_numbers', flat=True).order_by('-created_at')
     pk_queryset = Order.objects.filter(user=request.user).values_list('id', flat=True).order_by('-created_at')
     pk = pk_queryset[0] # 현재 인스턴스 id
@@ -90,7 +93,7 @@ def confirm(request):
 
         print(response) # 결제 상세 내용 저장하는 model, serializer도 만들어 보기
 
-        # PATCH 부분 이렇게 저장하는게 맞는지 잘 모르겠다..
+        # PATCH 부분 이렇게 저장하는게 맞는지 잘 모르겠다.. PUT method를 적용할 경우, 값이 바뀌지 않는 모든 컬럼까지 지정이 필요하다.
         # serializer를 거치지 않고 바로 모델에 접근해서 저장하는게 맞는건지?
         # 오류난 부분 없이 데이터를 정확하게 db에 insert했다는 점에서는 문제가 없다고 봐야하나..
         data = request.data
@@ -101,7 +104,7 @@ def confirm(request):
         
         return Response(response)
     except Exception:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error_message': 'api 요청 혹은 db update 과정에서 문제가 발생했습니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OrdersList(APIView):
