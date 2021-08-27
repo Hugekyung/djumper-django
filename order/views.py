@@ -67,13 +67,11 @@ def checkout(request):
 def confirm(request):
     tid_queryset = Order.objects.filter(user=request.user).values_list('payment_unique_numbers', flat=True).order_by('-created_at')
     pk_queryset = Order.objects.filter(user=request.user).values_list('id', flat=True).order_by('-created_at')
-    pk = pk_queryset[0]
+    pk = pk_queryset[0] # 현재 인스턴스 id
     tid = tid_queryset[0] # 가장 최근에 추가된 tid
 
     pg_token = request.data['pg_token'] # request.data의 유일한 데이터
-    # payment_status = True # 기존의 인스턴스에 업데이트 하려는 데이터
 
-    # if serializer.is_valid():
     url = "https://kapi.kakao.com"
     headers = {
         'Authorization': "KakaoAK " + settings.KAKAO_ADMIN_KEY,
@@ -104,8 +102,6 @@ def confirm(request):
         return Response(response)
     except Exception:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OrdersList(APIView):
