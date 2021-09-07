@@ -1,5 +1,5 @@
 # djumper-django
-본 저장소는 E-commerce 웹 서비스 Djumper의 Backend 관련 코드입니다.<br> 
+본 저장소는 E-commerce 웹 서비스 Djumper의 Backend 관련 내용입니다.<br> 
 --> [Frontend 이동](https://github.com/Hugekyung/djumper-vue)<br><br/>
 ### `Overview`
 ---
@@ -10,6 +10,7 @@
 OS                            Version
 ----------------------------- ---------
 Ubuntu                        20.04 LTS(WSL)
+
 
 Package                       Version  
 ----------------------------- ---------
@@ -24,6 +25,14 @@ djoser
 vue(with cli)
 axios
 bulma
+
+
+Deployment                    Version  
+----------------------------- ---------
+AWS EC2(Ubuntu)
+Docker
+Gunicorn
+Nginx
 ```
 <br><br/>
 
@@ -31,21 +40,34 @@ bulma
 ---
 
 #### 1. Python 가상환경 생성
+- 패키지 버전정보 업데이트
 ```
-$ sudo apt-get update
-$ sudo apt-get install python3-venv
-$ python3 -m venv myvenv # (프로젝트 폴더 내에서)
+sudo apt-get update
 ```
+- 파이썬 가상환경 모듈 설치
+```
+sudo apt-get install python3-venv
+```
+- 파이썬 가상환경 생성
+```
+python3 -m venv myvenv
+```
+<br>
 
 #### 2. 가상환경 내에서 Django 및 라이브러리 설치
+- 가상환경 연결
 ```
-$ source myvenv/bin/activate
-$ pip install -r requirements.txt
+source myvenv/bin/activate
 ```
+- 필요한 라이브러리 설치
+```
+pip install -r requirements.txt
+```
+<br>
 
 #### 3. Django server 실행(개발용)
 ```
-$ python manage.py runserver
+python manage.py runserver
 ```
 <br><br/>
 
