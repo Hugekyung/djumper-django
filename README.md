@@ -2,7 +2,7 @@
 본 저장소는 E-commerce 웹 서비스 Djumper의 Backend 관련 내용입니다.<br> 
 --> [Frontend 이동](https://github.com/Hugekyung/djumper-vue)<br><br/>
 ## `Overview`
----
+
 프로젝트의 목적은 백엔드에서 구현한 API를 프론트엔드에서 어떻게 활용하는지, 백-프론트 사이의 통신 방법과 비동기 처리 방식을 비롯한 전체 웹 서비스 구축 프로세스를 경험하기 위함입니다.<br><br/>
 
 ### Environment
@@ -37,7 +37,7 @@ Nginx
 <br><br/>
 
 ## `Usage(Back)`
----
+
 
 ### 1. Python 가상환경 생성
 - 패키지 버전정보 업데이트
@@ -88,7 +88,7 @@ python manage.py runserver
 <br><br/>
 
 ## `Django settings`
----
+
 ```
 # settings.py
 
@@ -132,5 +132,5 @@ MIDDLEWARE = [
 <br><br/>
 
 ## `ERD`
----
+
 ![djumper_ERD](https://user-images.githubusercontent.com/67989121/132223610-1e56d70b-3f70-4c07-a0da-a5c81c3d50e1.PNG)
